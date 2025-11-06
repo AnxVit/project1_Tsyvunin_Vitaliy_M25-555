@@ -1,5 +1,6 @@
 from labyrinth_game.constants import ROOMS
 
+
 def show_inventory(game_state):
     if len(game_state["player_inventory"]) == 0:
         print("Инвентарь пустой")
@@ -25,6 +26,10 @@ def move_player(game_state, direction):
 def take_item(game_state, item_name):
     if item_name not in ROOMS[game_state["current_room"]]["items"]:
         print("Такого предмета здесь нет.")
+        return
+    
+    if item_name == "treasure_chest":
+        print("Вы не можете поднять сундук, он слишком тяжелый.")
         return
     
     ROOMS[game_state["current_room"]]["items"].remove(item_name)

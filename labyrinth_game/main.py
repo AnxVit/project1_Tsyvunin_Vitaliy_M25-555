@@ -3,8 +3,6 @@
 import labyrinth_game.player_actions as pa
 import labyrinth_game.utils as u
 
-from labyrinth_game.constants import ROOMS
-
 game_state = {
     'player_inventory': [], # Инвентарь игрока
     'current_room': 'entrance', # Текущая комната
@@ -18,6 +16,7 @@ def process_command(game_state, command):
         case "go":
             if len(cmd) != 2:
                 print("Неправильная команда")
+                u.show_help()
                 return
             
             pa.move_player(game_state, cmd[1])
@@ -27,21 +26,31 @@ def process_command(game_state, command):
         case "take":
             if len(cmd) != 2:
                 print("Неправильная команда")
+                u.show_help()
                 return
             
             pa.take_item(game_state, cmd[1])
         case "use":
             if len(cmd) != 2:
                 print("Неправильная команда")
+                u.show_help()
                 return
-            # pa.use_item(game_state, cmd[1])
+            pa.use_item(game_state, cmd[1])
+        case "solve":
+            if game_state['current_room'] == "treasure_room":
+                u.attempt_open_treasure(game_state)
+            else:
+                u.solve_puzzle(game_state)
         case "inventory":
             pa.show_inventory(game_state)
         case "quit":
             game_state['game_over'] = True
             print("Game Over")
+        case "help":
+            u.show_help()
         case _:
             print("Неверная команда")
+            u.show_help()
     
 def main():
     print("Добро пожаловать в Лабиринт сокровищ!")

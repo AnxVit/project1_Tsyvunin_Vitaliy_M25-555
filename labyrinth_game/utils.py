@@ -1,5 +1,6 @@
 from labyrinth_game.constants import ROOMS
 
+key = 'treasure_key'
 
 def describe_current_room(game_state):
     room = game_state['current_room']
@@ -25,3 +26,61 @@ def print_exits(data, indent=0):
             print_exits(value, indent + 4)
         else:
             print(' ' * indent + f"{key}: {value}")
+
+def solve_puzzle(game_state):
+    room = game_state['current_room']
+    if ROOMS[room].get("puzzle") is None:
+        print("Загадок здесь нет.")
+        return
+    
+    puzzle = ROOMS[room]["puzzle"]
+    print(puzzle[0])
+    
+    answer = input("Ваш ответ: ")
+    while answer != "stop" and not game_state['game_over']:
+        if answer != puzzle[1]:
+            print("Неверно. Попробуйте снова. Чтобы закончить - stop")
+            answer = input("Ваш ответ: ")
+            continue
+
+        print("Успех!")
+        ROOMS[room]["puzzle"] = None
+        print("Вы получаете награду")
+        getAward(game_state)
+        return True
+    
+    return False
+
+def getAward(game_state):
+    award = ROOMS[game_state['current_room']]['award']
+    ROOMS[game_state['current_room']]['award'] = None
+    game_state["player_inventory"].append(award)
+    print("Вы получаете:", award)
+
+def attempt_open_treasure(game_state):
+    if key in game_state["player_inventory"]:
+        print("Вы применяете ключ, и замок щёлкает. Сундук открыт!")
+    else:
+        cmd = input("Сундук заперт. ... Ввести код? (да/нет)")
+        if cmd != "да":
+            print("Вы отступаете от сундука.")
+            return
+        
+        if not solve_puzzle(game_state):
+            print("Вы можете вернуться к сундуку позже.")
+            return
+
+    ROOMS[game_state['current_room']]['items'].remove('treasure_chest')
+    print("В сундуке сокровище! Вы победили!")
+    game_state['game_over'] = True
+
+def show_help():
+    print("\nДоступные команды:")
+    print("  go <direction>  - перейти в направлении (north/south/east/west)")
+    print("  look            - осмотреть текущую комнату")
+    print("  take <item>     - поднять предмет")
+    print("  use <item>      - использовать предмет из инвентаря")
+    print("  inventory       - показать инвентарь")
+    print("  solve           - попытаться решить загадку в комнате")
+    print("  quit            - выйти из игры")
+    print("  help            - показать это сообщение") 
