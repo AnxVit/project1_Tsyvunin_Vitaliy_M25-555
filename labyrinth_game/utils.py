@@ -1,7 +1,12 @@
-from labyrinth_game.constants import ROOMS
 import math
 
+from labyrinth_game.constants import ROOMS
+
 key = 'treasure_key'
+words = {
+    'один': '1', 'два': '2', 'три': '3', 'четыре': '4', 'пять': '5',
+    'шесть': '6', 'семь': '7', 'восемь': '8', 'девять': '9', 'десять': '10'
+}
 
 def describe_current_room(game_state):
     room = game_state['current_room']
@@ -39,8 +44,12 @@ def solve_puzzle(game_state):
     
     answer = input("Ваш ответ: ")
     while answer != "stop" and not game_state['game_over']:
-        if answer != puzzle[1]:
+        if answer != puzzle[1] and puzzle[1] != words.get(answer):
             print("Неверно. Попробуйте снова. Чтобы закончить - stop")
+            if room == "trap_room":
+                trigger_trap(game_state)
+                if game_state['game_over']:
+                    return
             answer = input("Ваш ответ: ")
             continue
 
@@ -91,7 +100,9 @@ def trigger_trap(game_state):
         else:
             print("Игрок уцелел")
     else:
-        number_item = pseudo_random(game_state['steps_taken'], len(game_state['player_inventory']))
+        number_item = pseudo_random(
+            game_state['steps_taken'], len(game_state['player_inventory'])
+        )
         item = deleteItemOfInvenory(game_state, number_item)
         print("Вы потеряли предмет: ", item)
 
@@ -115,13 +126,7 @@ def random_event(game_state):
                     print("Вы в опасности")
                     trigger_trap(game_state)
 
-def show_help():
+def show_help(COMMANDS):
     print("\nДоступные команды:")
-    print("  go <direction>  - перейти в направлении (north/south/east/west)")
-    print("  look            - осмотреть текущую комнату")
-    print("  take <item>     - поднять предмет")
-    print("  use <item>      - использовать предмет из инвентаря")
-    print("  inventory       - показать инвентарь")
-    print("  solve           - попытаться решить загадку в комнате")
-    print("  quit            - выйти из игры")
-    print("  help            - показать это сообщение") 
+    for command, description in COMMANDS.items():
+        print(f"{command:<16} - {description}")
