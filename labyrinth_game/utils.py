@@ -46,7 +46,7 @@ def solve_puzzle(game_state):
     while answer != "stop" and not game_state['game_over']:
         if answer != puzzle[1] and puzzle[1] != words.get(answer):
             print("Неверно. Попробуйте снова. Чтобы закончить - stop")
-            if room == "trap_room":
+            if room == "trap_room" or room == "lair":
                 trigger_trap(game_state)
                 if game_state['game_over']:
                     return
@@ -93,7 +93,7 @@ def trigger_trap(game_state):
     print("Ловушка активирована! Пол стал дрожать...")
     if len(game_state['player_inventory']) == 0:
         damage = pseudo_random(game_state['steps_taken'], 9)
-        p = 3
+        p = 6 if game_state['current_room'] == 'lair' else 3
         if damage < p:
             print("Вы получили смертельный урон")
             game_state['game_over'] = True

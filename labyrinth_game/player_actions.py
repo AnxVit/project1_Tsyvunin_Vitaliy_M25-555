@@ -21,6 +21,10 @@ def move_player(game_state, direction):
         print("Нельзя пойти в этом направлении.")
         return
     
+    if game_state["current_room"] == 'lair' and ROOMS[game_state["current_room"]]['puzzle'] is not None:
+        print("Вы не можете покинуть это место, пока не решите загадку")
+        return
+    
     if ROOMS[game_state["current_room"]]['exits'].get(direction) == "treasure_room":
         if "rusty_key" not in game_state["player_inventory"]:
             print("Дверь заперта. Нужен ключ, чтобы пройти дальше.")
