@@ -1,4 +1,5 @@
 from labyrinth_game.constants import ROOMS
+import labyrinth_game.utils as u
 
 
 def show_inventory(game_state):
@@ -22,6 +23,7 @@ def move_player(game_state, direction):
     
     game_state["steps_taken"] += 1
     game_state["current_room"] = ROOMS[game_state["current_room"]]['exits'][direction]
+    u.random_event(game_state)
 
 def take_item(game_state, item_name):
     if item_name not in ROOMS[game_state["current_room"]]["items"]:

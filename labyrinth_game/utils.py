@@ -1,4 +1,5 @@
 from labyrinth_game.constants import ROOMS
+import math
 
 key = 'treasure_key'
 
@@ -73,6 +74,46 @@ def attempt_open_treasure(game_state):
     ROOMS[game_state['current_room']]['items'].remove('treasure_chest')
     print("В сундуке сокровище! Вы победили!")
     game_state['game_over'] = True
+
+def pseudo_random(seed, modulo):
+    x = math.sin(seed * 12.345) * 6789.1011
+    x = x - math.floor(x)
+    return math.floor(x * modulo)
+
+def trigger_trap(game_state):
+    print("Ловушка активирована! Пол стал дрожать...")
+    if len(game_state['player_inventory']) == 0:
+        damage = pseudo_random(game_state['steps_taken'], 9)
+        p = 3
+        if damage < p:
+            print("Вы получили смертельный урон")
+            game_state['game_over'] = True
+        else:
+            print("Игрок уцелел")
+    else:
+        number_item = pseudo_random(game_state['steps_taken'], len(game_state['player_inventory']))
+        item = deleteItemOfInvenory(game_state, number_item)
+        print("Вы потеряли предмет: ", item)
+
+def deleteItemOfInvenory(game_state, n_item):
+    return game_state['player_inventory'].pop(n_item)
+
+def random_event(game_state):
+    p_event = pseudo_random(game_state['steps_taken'], 10)
+    if p_event < 4:
+        event = pseudo_random(game_state['steps_taken'], 3)
+        match event:
+            case 0:
+                print("Вы находите монетку")
+                game_state['player_inventory'].append("coin")
+            case 1:
+                print("Вы слышите шорох")
+                if "sword" in game_state['player_inventory']:
+                    print("Вы отпугнули существо")
+            case 2:
+                if game_state['current_room'] == "trap_room" and "torch" not in game_state['player_inventory']:
+                    print("Вы в опасности")
+                    trigger_trap(game_state)
 
 def show_help():
     print("\nДоступные команды:")
