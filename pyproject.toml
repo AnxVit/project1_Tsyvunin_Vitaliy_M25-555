@@ -1,7 +1,7 @@
 [project]
 name = "project1-tsyvunin-vitaliy-m25-555"
 version = "0.1.0"
-description = ""
+description = "Игра лабиринт. Консольная игра основанная на использовании функций"
 authors = [
     {name = "Vitaliy",email = "vcyvunin@gmail.com"}
 ]
