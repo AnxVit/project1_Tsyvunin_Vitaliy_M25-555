@@ -21,7 +21,8 @@ def move_player(game_state, direction):
         print("Нельзя пойти в этом направлении.")
         return
     
-    if game_state["current_room"] == 'lair' and ROOMS[game_state["current_room"]]['puzzle'] is not None:
+    if (game_state["current_room"] == 'lair' and 
+            ROOMS[game_state["current_room"]]['puzzle'] is not None):
         print("Вы не можете покинуть это место, пока не решите загадку")
         return
     

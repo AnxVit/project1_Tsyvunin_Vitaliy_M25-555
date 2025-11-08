@@ -1,3 +1,5 @@
+KEY = 'treasure_key'
+
 ROOMS = {
     'entrance': {
         'description': '''Вы в темном входе лабиринта. 
@@ -65,7 +67,7 @@ ROOMS = {
         'exits': {'west': 'cave'},
         'items': [],
         'puzzle': ('Что было завтра, а будет вчера', 'сегодня'),
-        'award': 'treasure_key'
+        'award': KEY
     }
 }
 
@@ -78,4 +80,19 @@ COMMANDS = {
     "solve": "попытаться решить загадку в комнате",
     "quit": "выйти из игры",
     "help": "показать это сообщение"
+}
+
+EVENT_PROBABILITY = 10
+NUMER_EVENTS = 3
+EVENT_SUCCESS = 4
+
+DAMAGE_PROBABILITY = 9
+ROOM_DAMAGE = 3
+LAIR_DAMAGE = 6
+
+BASE_IDENT = 4
+
+WORDS = {
+    'один': '1', 'два': '2', 'три': '3', 'четыре': '4', 'пять': '5',
+    'шесть': '6', 'семь': '7', 'восемь': '8', 'девять': '9', 'десять': '10'
 }

@@ -1,16 +1,11 @@
 import math
 
-from labyrinth_game.constants import ROOMS
+import labyrinth_game.constants as const
 
-key = 'treasure_key'
-words = {
-    'один': '1', 'два': '2', 'три': '3', 'четыре': '4', 'пять': '5',
-    'шесть': '6', 'семь': '7', 'восемь': '8', 'девять': '9', 'десять': '10'
-}
 
 def describe_current_room(game_state):
     room = game_state['current_room']
-    info = ROOMS[room]
+    info = const.ROOMS[room]
     printInfo(room, info)
 
 
@@ -20,7 +15,7 @@ def printInfo(roomname, info):
     if len(info['items']) != 0:
         print("Заметные предметы: ", info['items'])
 
-    print_exits(info['exits'], 4)
+    print_exits(info['exits'], const.BASE_IDENT)
     if info.get("puzzle") is not None:
         print("Кажется, здесь есть загадка (используйте команду solve).")
 
@@ -35,16 +30,16 @@ def print_exits(data, indent=0):
 
 def solve_puzzle(game_state):
     room = game_state['current_room']
-    if ROOMS[room].get("puzzle") is None:
+    if const.ROOMS[room].get("puzzle") is None:
         print("Загадок здесь нет.")
         return
     
-    puzzle = ROOMS[room]["puzzle"]
+    puzzle = const.ROOMS[room]["puzzle"]
     print(puzzle[0])
     
     answer = input("Ваш ответ: ")
     while answer != "stop" and not game_state['game_over']:
-        if answer != puzzle[1] and puzzle[1] != words.get(answer):
+        if answer != puzzle[1] and puzzle[1] != const.WORDS.get(answer):
             print("Неверно. Попробуйте снова. Чтобы закончить - stop")
             if room == "trap_room" or room == "lair":
                 trigger_trap(game_state)
@@ -54,7 +49,7 @@ def solve_puzzle(game_state):
             continue
 
         print("Успех!")
-        ROOMS[room]["puzzle"] = None
+        const.ROOMS[room]["puzzle"] = None
         print("Вы получаете награду")
         getAward(game_state)
         return True
@@ -62,13 +57,13 @@ def solve_puzzle(game_state):
     return False
 
 def getAward(game_state):
-    award = ROOMS[game_state['current_room']]['award']
-    ROOMS[game_state['current_room']]['award'] = None
+    award = const.ROOMS[game_state['current_room']]['award']
+    const.ROOMS[game_state['current_room']]['award'] = None
     game_state["player_inventory"].append(award)
     print("Вы получаете:", award)
 
 def attempt_open_treasure(game_state):
-    if key in game_state["player_inventory"]:
+    if const.KEY in game_state["player_inventory"]:
         print("Вы применяете ключ, и замок щёлкает. Сундук открыт!")
     else:
         cmd = input("Сундук заперт. ... Ввести код? (да/нет)")
@@ -80,7 +75,7 @@ def attempt_open_treasure(game_state):
             print("Вы можете вернуться к сундуку позже.")
             return
 
-    ROOMS[game_state['current_room']]['items'].remove('treasure_chest')
+    const.ROOMS[game_state['current_room']]['items'].remove('treasure_chest')
     print("В сундуке сокровище! Вы победили!")
     game_state['game_over'] = True
 
@@ -92,8 +87,10 @@ def pseudo_random(seed, modulo):
 def trigger_trap(game_state):
     print("Ловушка активирована! Пол стал дрожать...")
     if len(game_state['player_inventory']) == 0:
-        damage = pseudo_random(game_state['steps_taken'], 9)
-        p = 6 if game_state['current_room'] == 'lair' else 3
+        damage = pseudo_random(game_state['steps_taken'], const.DAMAGE_PROBABILITY)
+        p = const.ROOM_DAMAGE 
+        if game_state['current_room'] == 'lair':
+            p = const.LAIR_DAMAGE
         if damage < p:
             print("Вы получили смертельный урон")
             game_state['game_over'] = True
@@ -110,9 +107,9 @@ def deleteItemOfInvenory(game_state, n_item):
     return game_state['player_inventory'].pop(n_item)
 
 def random_event(game_state):
-    p_event = pseudo_random(game_state['steps_taken'], 10)
-    if p_event < 4:
-        event = pseudo_random(game_state['steps_taken'], 3)
+    p_event = pseudo_random(game_state['steps_taken'], const.EVENT_PROBABILITY)
+    if p_event < const.EVENT_SUCCESS:
+        event = pseudo_random(game_state['steps_taken'], const.NUMER_EVENTS)
         match event:
             case 0:
                 print("Вы находите монетку")
@@ -122,7 +119,8 @@ def random_event(game_state):
                 if "sword" in game_state['player_inventory']:
                     print("Вы отпугнули существо")
             case 2:
-                if game_state['current_room'] == "trap_room" and "torch" not in game_state['player_inventory']:
+                if (game_state['current_room'] == "trap_room" and 
+                        "torch" not in game_state['player_inventory']):
                     print("Вы в опасности")
                     trigger_trap(game_state)
 
