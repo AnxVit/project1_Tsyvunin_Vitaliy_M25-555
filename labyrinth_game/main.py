@@ -49,7 +49,6 @@ def process_command(game_state, command):
             u.describe_current_room(game_state)
         case "quit":
             game_state['game_over'] = True
-            print("Game Over")
         case "help":
             u.show_help(COMMANDS)
         case _:
