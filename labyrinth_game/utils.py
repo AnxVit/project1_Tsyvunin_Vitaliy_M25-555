@@ -86,7 +86,7 @@ def pseudo_random(seed, modulo):
 
 def trigger_trap(game_state):
     print("Ловушка активирована! Пол стал дрожать...")
-    if len(game_state['player_inventory']) == 0:
+    if len(game_state['player_inventory']) == 0 or game_state['current_room'] == 'lair':
         damage = pseudo_random(game_state['steps_taken'], const.DAMAGE_PROBABILITY)
         p = const.ROOM_DAMAGE 
         if game_state['current_room'] == 'lair':
