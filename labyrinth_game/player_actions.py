@@ -3,12 +3,36 @@ from labyrinth_game.constants import ROOMS
 
 
 def show_inventory(game_state):
+    '''
+    Show the player his inentory
+
+    Parameters
+    ----------
+    game_state : dict
+        info about game state
+
+    Returns
+    -------
+    None
+    '''
     if len(game_state["player_inventory"]) == 0:
         print("Инвентарь пустой")
     else:
         print("Инвентарь: ", game_state["player_inventory"])
 
 def get_input(prompt="> "):
+    '''
+    Get input from player 
+
+    Parameters
+    ----------
+    prompt : string
+        output at the beginning of input
+    Returns
+    -------
+    string
+        player input
+    '''
     try:
         s = input(prompt)
         return s
@@ -17,6 +41,23 @@ def get_input(prompt="> "):
         return "quit" 
     
 def move_player(game_state, direction):
+    '''
+    Move player by direction
+    Increasing number of steps
+    Change state of current room
+    Generate random event
+
+    Parameters
+    ----------
+    game_state : dict
+        info about game state
+    direction: string
+        move direction 
+
+    Returns
+    -------
+    None
+    '''
     if ROOMS[game_state["current_room"]]['exits'].get(direction) is None:
         print("Нельзя пойти в этом направлении.")
         return
@@ -40,6 +81,22 @@ def move_player(game_state, direction):
     u.random_event(game_state)
 
 def take_item(game_state, item_name):
+    '''
+    Take item in current room
+    Put it to inventory
+    Remove it from the room
+
+    Parameters
+    ----------
+    game_state : dict
+        info about game state
+    item_name: string
+        item name
+
+    Returns
+    -------
+    None
+    '''
     if item_name not in ROOMS[game_state["current_room"]]["items"]:
         print("Такого предмета здесь нет.")
         return
@@ -53,6 +110,22 @@ def take_item(game_state, item_name):
     print("Вы подняли:", item_name)
 
 def use_item(game_state, item_name):
+    '''
+    Use item from player inventory
+    If an item has a property, display the item properties
+    Delete item from inventory
+
+    Parameters
+    ----------
+    game_state : dict
+        info about game state
+    item_name: string
+        item name
+
+    Returns
+    -------
+    None
+    '''
     if item_name not in game_state["player_inventory"]:
         print("У вас нет такого предмета.")
         return

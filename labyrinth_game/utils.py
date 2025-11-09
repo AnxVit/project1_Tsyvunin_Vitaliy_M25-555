@@ -4,13 +4,39 @@ import labyrinth_game.constants as const
 
 
 def describe_current_room(game_state):
+    '''
+    Display info about current room
+
+    Parameters
+    ----------
+    game_state : dic
+        info about game state
+
+    Returns
+    -------
+    None
+    '''
     room = game_state['current_room']
     info = const.ROOMS[room]
     printInfo(room, info)
 
 
-def printInfo(roomname, info):
-    print(f'============ {roomname.upper()} ============')
+def printInfo(room_name, info):
+    '''
+    Display info about the room in beautiful format
+
+    Parameters
+    ----------
+    room_name : string
+        room name
+    info: dict
+        info about current room
+
+    Returns
+    -------
+    None
+    '''
+    print(f'============ {room_name.upper()} ============')
     print("Описание: ", info['description'])
     if len(info['items']) != 0:
         print("Заметные предметы: ", info['items'])
@@ -20,6 +46,20 @@ def printInfo(roomname, info):
         print("Кажется, здесь есть загадка (используйте команду solve).")
 
 def print_exits(data, indent=0):
+    '''
+    Display exits room in beautiful format
+
+    Parameters
+    ----------
+    data : dict
+        direction -> name of room
+    indent: int
+        input ident
+
+    Returns
+    -------
+    None
+    '''
     print("Выходы: ")
     for key, value in data.items():
         if isinstance(value, dict):
@@ -29,6 +69,22 @@ def print_exits(data, indent=0):
             print(' ' * indent + f"{key}: {value}")
 
 def solve_puzzle(game_state):
+    '''
+    If there is a puzzle in the room, dispaly the question.
+    Wait for thh user to enter the correct answer.
+    Leave by entering the "stop" command.
+    Remove puzzle from the room if it is solved.
+
+    Parameters
+    ----------
+    game_state : dic
+        info about game state
+
+    Returns
+    -------
+    bool
+        puzzle solved?
+    '''
     room = game_state['current_room']
     if const.ROOMS[room].get("puzzle") is None:
         print("Загадок здесь нет.")
@@ -57,12 +113,39 @@ def solve_puzzle(game_state):
     return False
 
 def getAward(game_state):
+    '''
+    Add award in inventory
+
+    Parameters
+    ----------
+    game_state : dict
+        info about game state
+
+    Returns
+    -------
+    None
+    '''
     award = const.ROOMS[game_state['current_room']]['award']
     const.ROOMS[game_state['current_room']]['award'] = None
     game_state["player_inventory"].append(award)
     print("Вы получаете:", award)
 
 def attempt_open_treasure(game_state):
+    '''
+    Check if key exits in play invenory.
+    If exists - game over.
+    Else - solve puzzle.
+    If th player cannot solve the puzzle, move away from the chest.
+
+    Parameters
+    ----------
+    game_state : dict
+        info about game state
+    
+    Returns
+    -------
+    None
+    '''
     if const.KEY in game_state["player_inventory"]:
         print("Вы применяете ключ, и замок щёлкает. Сундук открыт!")
     else:
@@ -80,11 +163,41 @@ def attempt_open_treasure(game_state):
     game_state['game_over'] = True
 
 def pseudo_random(seed, modulo):
+    '''
+    Pseudo random number generator
+
+    Parameters
+    ----------
+    seed: int
+        coef (number of stepts)
+    modulo: int
+        coef (const)
+
+    Returns
+    -------
+    int
+        random int
+    '''
     x = math.sin(seed * 12.345) * 6789.1011
     x = x - math.floor(x)
     return math.floor(x * modulo)
 
 def trigger_trap(game_state):
+    '''
+    Creating trap
+    If th player has nothing in their inventory - damage (unlikely)
+    If th player in room lair - damage (high probability)
+    Else: delete random item from inventory
+
+    Parameters
+    ----------
+    game_state : dict
+        info about game state
+    
+    Returns
+    -------
+    None
+    '''
     print("Ловушка активирована! Пол стал дрожать...")
     if len(game_state['player_inventory']) == 0 or game_state['current_room'] == 'lair':
         damage = pseudo_random(game_state['steps_taken'], const.DAMAGE_PROBABILITY)
@@ -100,13 +213,43 @@ def trigger_trap(game_state):
         number_item = pseudo_random(
             game_state['steps_taken'], len(game_state['player_inventory'])
         )
-        item = deleteItemOfInvenory(game_state, number_item)
+        item = delete_item_of_invenory(game_state, number_item)
         print("Вы потеряли предмет: ", item)
 
-def deleteItemOfInvenory(game_state, n_item):
+def delete_item_of_invenory(game_state, n_item):
+    '''
+    Pseudo random number generator
+
+    Parameters
+    ----------
+    game_state : dict
+        info about game state
+    n_item: int
+        number of item in inventory
+
+    Returns
+    -------
+    string
+        item name
+    '''
     return game_state['player_inventory'].pop(n_item)
 
 def random_event(game_state):
+    '''
+    Creating a random event.
+    If the pseudo random number is less than the event probability,
+    create the event.
+    Create a pseudo rand number to create a specific event
+
+    Parameters
+    ----------
+    game_state : dict
+        info about game state
+    
+    Returns
+    -------
+    None
+    '''
     p_event = pseudo_random(game_state['steps_taken'], const.EVENT_PROBABILITY)
     if p_event < const.EVENT_SUCCESS:
         event = pseudo_random(game_state['steps_taken'], const.NUMER_EVENTS)
@@ -125,6 +268,18 @@ def random_event(game_state):
                     trigger_trap(game_state)
 
 def show_help(COMMANDS):
+    '''
+    Show acceptable commands
+
+    Parameters
+    ----------
+    COMMANDS: dict
+        command -> description
+
+    Returns
+    -------
+    None
+    '''
     print("\nДоступные команды:")
     for command, description in COMMANDS.items():
         print(f"{command:<16} - {description}")
