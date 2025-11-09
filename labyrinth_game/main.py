@@ -12,6 +12,20 @@ game_state = {
 }
 
 def process_command(game_state, command):
+    '''
+    Process user commads
+
+    Parameters
+    ----------
+    game_state : dict
+        info about game state
+    command : string
+        user command
+
+    Returns
+    -------
+    None
+    '''
     cmd = command.split()
     match cmd[0]:
         case "go":
